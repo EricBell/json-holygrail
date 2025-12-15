@@ -423,8 +423,9 @@ def main():
     """Main entry point"""
     if len(sys.argv) < 2:
         print("Usage: python main.py <input.json> [output.md]")
-        print("\nExample:")
+        print("\nExamples:")
         print("  python main.py trade-plan-MES-2025-12-14.json")
+        print("  python main.py input.json output.md")
         print("  python main.py input.json -o output.md")
         sys.exit(1)
 
@@ -432,7 +433,11 @@ def main():
 
     # Determine output file
     if len(sys.argv) >= 4 and sys.argv[2] == "-o":
+        # Format: python main.py input.json -o output.md
         output_file = Path(sys.argv[3])
+    elif len(sys.argv) >= 3:
+        # Format: python main.py input.json output.md
+        output_file = Path(sys.argv[2])
     else:
         # Auto-generate output filename
         output_file = input_file.with_suffix(".md")
