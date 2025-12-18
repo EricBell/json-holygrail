@@ -2,17 +2,6 @@
 """
 Version management system with file hashing
 Automatically tracks file changes and manages version numbers
-
-To bump up the major version, use:
-    python version_manager.py major
-To reset the version to v1.0.0, use:
-    python version_manager.py reset
-To reset to a specific version, use:
-    python version_manager.py reset <major> <minor> <patch>
-To check for changes and update the version, use:
-    python version_manager.py check
-To get the current version, use:
-    python version_manager.py status    
 """
 
 import os
@@ -201,51 +190,47 @@ def increment_major() -> str:
     major, minor, patch = version_manager.increment_major_version()
     return f"v{major}.{minor}.{patch}"
 
-# CLI interface
+# Simple standalone usage for development
 if __name__ == '__main__':
     import sys
-    
-    if len(sys.argv) < 2:
-        print("Version Manager Commands:")
-        print("  python version_manager.py status    - Show current version")
-        print("  python version_manager.py check     - Check for changes and update")
-        print("  python version_manager.py major     - Increment major version")
-        print("  python version_manager.py reset     - Reset to v1.0.0")
-        print("  python version_manager.py reset X Y Z - Reset to vX.Y.Z")
-        sys.exit(1)
-    
-    command = sys.argv[1].lower()
-    
-    if command == 'status':
-        major, minor, patch = version_manager.get_current_version()
-        print(f"Current version: v{major}.{minor}.{patch}")
-    
-    elif command == 'check':
-        major, minor, patch, changed = version_manager.check_and_update_version()
-        if changed:
-            print(f"Version updated to v{major}.{minor}.{patch}")
-        else:
-            print(f"No changes detected. Version remains v{major}.{minor}.{patch}")
-    
-    elif command == 'major':
-        major, minor, patch = version_manager.increment_major_version()
-        print(f"Major version incremented to v{major}.{minor}.{patch}")
-    
-    elif command == 'reset':
-        if len(sys.argv) == 5:
-            try:
-                major = int(sys.argv[2])
-                minor = int(sys.argv[3])
-                patch = int(sys.argv[4])
-                major, minor, patch = version_manager.reset_version(major, minor, patch)
+
+    if len(sys.argv) > 1:
+        command = sys.argv[1].lower()
+
+        if command == 'status':
+            major, minor, patch = version_manager.get_current_version()
+            print(f"Current version: v{major}.{minor}.{patch}")
+
+        elif command == 'check':
+            major, minor, patch, changed = version_manager.check_and_update_version()
+            if changed:
+                print(f"Version updated to v{major}.{minor}.{patch}")
+            else:
+                print(f"No changes detected. Version remains v{major}.{minor}.{patch}")
+
+        elif command == 'major':
+            major, minor, patch = version_manager.increment_major_version()
+            print(f"Major version incremented to v{major}.{minor}.{patch}")
+
+        elif command == 'reset':
+            if len(sys.argv) == 5:
+                try:
+                    maj = int(sys.argv[2])
+                    min = int(sys.argv[3])
+                    pat = int(sys.argv[4])
+                    major, minor, patch = version_manager.reset_version(maj, min, pat)
+                    print(f"Version reset to v{major}.{minor}.{patch}")
+                except ValueError:
+                    print("Error: Version numbers must be integers")
+                    sys.exit(1)
+            else:
+                major, minor, patch = version_manager.reset_version()
                 print(f"Version reset to v{major}.{minor}.{patch}")
-            except ValueError:
-                print("Error: Major, minor, and patch versions must be integers")
-                sys.exit(1)
+
         else:
-            major, minor, patch = version_manager.reset_version()
-            print(f"Version reset to v{major}.{minor}.{patch}")
-    
+            print(f"Unknown command: {command}")
+            print("Available commands: status, check, major, reset")
+            sys.exit(1)
     else:
-        print(f"Unknown command: {command}")
-        sys.exit(1)
+        major, minor, patch = version_manager.get_current_version()
+        print(f"v{major}.{minor}.{patch}")

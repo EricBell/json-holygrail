@@ -7,7 +7,9 @@ Converts structured trading plan JSON into formatted markdown documents
 import json
 import sys
 from pathlib import Path
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
+import typer
+from version_manager import version_manager
 
 
 def format_price(value: Any) -> str:
@@ -419,25 +421,58 @@ def convert_json_to_markdown(json_data: Dict[str, Any]) -> str:
     return markdown
 
 
-def main():
-    """Main entry point"""
-    if len(sys.argv) < 2:
-        print("Usage: python main.py <input.json> [output.md]")
-        print("\nExamples:")
-        print("  python main.py trade-plan-MES-2025-12-14.json")
-        print("  python main.py input.json output.md")
-        print("  python main.py input.json -o output.md")
-        sys.exit(1)
+app = typer.Typer(help="Trading Plan JSON to Markdown Converter")
 
-    input_file = Path(sys.argv[1])
+def version_callback(value: bool):
+    """Show version and exit"""
+    if value:
+        major, minor, patch = version_manager.get_current_version()
+        typer.echo(f"v{major}.{minor}.{patch}")
+        raise typer.Exit()
 
+@app.callback()
+def callback(
+    version: Optional[bool] = typer.Option(
+        None,
+        "--version",
+        "-v",
+        help="Show version and exit",
+        callback=version_callback,
+        is_eager=True,
+    )
+):
+    """Trading Plan JSON to Markdown Converter"""
+    pass
+
+@app.command()
+def convert(
+    input_file: Path = typer.Argument(
+        ...,
+        help="Input JSON file containing trading plan data",
+        exists=True,
+        file_okay=True,
+        dir_okay=False,
+        readable=True,
+    ),
+    output: Optional[Path] = typer.Option(
+        None,
+        "--output",
+        "-o",
+        help="Output markdown file (default: same name as input with .md extension)",
+        file_okay=True,
+        dir_okay=False,
+    ),
+):
+    """
+    Convert trading plan JSON file to formatted markdown document.
+
+    Examples:
+      python main.py convert trade-plan-MES-2025-12-14.json
+      python main.py convert input.json -o output.md
+    """
     # Determine output file
-    if len(sys.argv) >= 4 and sys.argv[2] == "-o":
-        # Format: python main.py input.json -o output.md
-        output_file = Path(sys.argv[3])
-    elif len(sys.argv) >= 3:
-        # Format: python main.py input.json output.md
-        output_file = Path(sys.argv[2])
+    if output:
+        output_file = output
     else:
         # Auto-generate output filename
         output_file = input_file.with_suffix(".md")
@@ -447,11 +482,11 @@ def main():
         with open(input_file, "r", encoding="utf-8") as f:
             json_data = json.load(f)
     except FileNotFoundError:
-        print(f"Error: File not found: {input_file}")
-        sys.exit(1)
+        typer.echo(f"Error: File not found: {input_file}", err=True)
+        raise typer.Exit(1)
     except json.JSONDecodeError as e:
-        print(f"Error: Invalid JSON in {input_file}: {e}")
-        sys.exit(1)
+        typer.echo(f"Error: Invalid JSON in {input_file}: {e}", err=True)
+        raise typer.Exit(1)
 
     # Convert to markdown
     markdown_content = convert_json_to_markdown(json_data)
@@ -460,11 +495,16 @@ def main():
     try:
         with open(output_file, "w", encoding="utf-8") as f:
             f.write(markdown_content)
-        print(f"✅ Successfully converted {input_file} to {output_file}")
+        typer.echo(f"✅ Successfully converted {input_file} to {output_file}")
     except IOError as e:
-        print(f"Error: Could not write to {output_file}: {e}")
-        sys.exit(1)
+        typer.echo(f"Error: Could not write to {output_file}: {e}", err=True)
+        raise typer.Exit(1)
+
+
+def main():
+    """Main entry point for setuptools console_scripts"""
+    app()
 
 
 if __name__ == "__main__":
-    main()
+    app()
