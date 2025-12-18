@@ -108,9 +108,11 @@ def generate_header(data: Dict[str, Any]) -> str:
     else:
         asset_name = "ASSET"
 
-    header = f"""# {ticker} | {direction} | {confidence}
+    header = f"""# {ticker} {direction}
 
-## Trade Instructions
+**Confidence**: {confidence}
+
+## Trigger
 > {wait_for}
 
 ## Trade Parameters

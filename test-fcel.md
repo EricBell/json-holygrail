@@ -1,6 +1,8 @@
-# FCEL | LONG | 86%
+# FCEL LONG
 
-## Trade Instructions
+**Confidence**: 86%
+
+## Trigger
 > Wait for price to pull back/consolidate into the $10.15–$10.35 zone (above VWAP), then BUY upon signs of stabilization.
 
 ## Trade Parameters
