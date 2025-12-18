@@ -42,60 +42,94 @@ def format_dict_as_list(data: Dict[str, Any], label_suffix: str = "") -> str:
 
 
 def generate_header(data: Dict[str, Any]) -> str:
-    """Generate the header section matching holy grail format"""
+    """Generate the top boxed section matching holy grail format"""
     trade_plan = data.get("trade_plan", {})
     verdict = trade_plan.get("verdict", {})
     entry = trade_plan.get("entry", {})
+    position = trade_plan.get("position", {})
+    exits = trade_plan.get("exits", {})
 
-    # Extract key information
-    action = verdict.get("action", "NO ACTION")
-    confidence = verdict.get("confidence", "Unknown")
+    # 1. Stock Identifier, Trade Direction, Confidence
     ticker = data.get("ticker", "UNKNOWN")
-    asset_type = data.get("asset_type", "UNKNOWN")
-    trade_style = data.get("trade_style", "UNKNOWN")
-    direction = entry.get("direction", "UNKNOWN")
+    direction = entry.get("direction", "UNKNOWN").upper()
+    confidence = verdict.get("confidence", "Unknown")
 
-    # Extract action verb (BUY/SELL/SHORT) and asset type
+    # 2. Trade Notes/Instruction Box
+    wait_for = entry.get("wait_for", "No specific entry instructions provided")
+    ideal_zone = entry.get("ideal_zone", {})
+
+    # 3. Trade Parameter Cards
+    size_rec = position.get("size_recommendation", "Unknown").upper()
+
+    stop_loss = exits.get("stop_loss", {})
+    stop_range = stop_loss.get("price_range", [])
+    if stop_range and len(stop_range) >= 1:
+        stop_text = f"${stop_range[0]:.2f}" if len(stop_range) == 1 else f"${stop_range[0]:.2f} – ${stop_range[-1]:.2f}"
+    else:
+        stop_text = "Not set"
+
+    profit_targets = exits.get("profit_targets", [])
+    if profit_targets and len(profit_targets) > 0:
+        target = profit_targets[0]
+        target_range = target.get("price_range", [])
+        if target_range and len(target_range) >= 1:
+            target_text = f"${target_range[0]:.2f}" if len(target_range) == 1 else f"${target_range[0]:.2f} – ${target_range[-1]:.2f}"
+        else:
+            target_text = "Not set"
+    else:
+        target_text = "Not set"
+
+    risk_percent = data.get("risk_percent", 0)
+    max_risk = position.get("max_risk", "Unknown")
+    risk_note = f"Risk {risk_percent}% of account ({max_risk})"
+
+    # 4. Technical Alignment Summary (we'll pull from technical agent reasoning)
+    agents = data.get("agent_verdicts", {})
+    technical = agents.get("technical", {})
+    tech_reasoning = technical.get("reasoning", [])
+    tech_summary = " ".join(tech_reasoning[:2]) if tech_reasoning else "No technical summary available"
+
+    # 5. Action Buttons
+    action = verdict.get("action", "TRADE ASSET")
+    asset_type = data.get("asset_type", "ASSET")
+    trade_style = data.get("trade_style", "TRADE")
+
+    # Extract action verb
     action_parts = action.split()
     action_verb = action_parts[0] if action_parts else "TRADE"
-    asset_name = " ".join(action_parts[1:]) if len(action_parts) > 1 else "ASSET"
 
-    header = f"""# {direction.upper()}
+    # Map asset type to simple name
+    if "STOCK" in asset_type.upper():
+        asset_name = "STOCK"
+    elif "FUTURES" in asset_type.upper() or "FUTURE" in asset_type.upper():
+        asset_name = "FUTURES"
+    elif "OPTION" in asset_type.upper():
+        asset_name = "OPTIONS"
+    else:
+        asset_name = "ASSET"
 
-**Confidence**: {confidence} | **{ticker}** | **{asset_type}** | **{trade_style}**
+    header = f"""# {ticker} | {direction} | {confidence}
+
+## Trade Instructions
+> {wait_for}
+
+## Trade Parameters
+
+| **Position Size** | **Stop Loss** | **Target** | **Risk Note** |
+|-------------------|---------------|------------|---------------|
+| {size_rec} | {stop_text} | {target_text} | {risk_note} |
+
+## Technical Alignment
+{tech_summary}
+
+---
+
+**{action_verb} {asset_name}     {asset_name}     {trade_style}**
 
 ---
 
 """
     return header
-
-
-def generate_trade_action_line(data: Dict[str, Any]) -> str:
-    """Generate the trade action line matching holy grail format (e.g., 'buy stock     stock     day')"""
-    trade_plan = data.get("trade_plan", {})
-    verdict = trade_plan.get("verdict", {})
-
-    action = verdict.get("action", "NO ACTION")
-    asset_type = data.get("asset_type", "UNKNOWN")
-    trade_style = data.get("trade_style", "UNKNOWN")
-
-    # Extract action verb (BUY, SELL, SHORT, etc.)
-    action_parts = action.split()
-    action_verb = action_parts[0].lower() if action_parts else "trade"
-
-    # Map asset type to simple name
-    asset_name = asset_type.lower() if asset_type != "UNKNOWN" else "asset"
-    if "STOCK" in asset_type.upper():
-        asset_name = "stock"
-    elif "FUTURES" in asset_type.upper() or "FUTURE" in asset_type.upper():
-        asset_name = "futures"
-    elif "OPTION" in asset_type.upper():
-        asset_name = "options"
-
-    # Map trade style
-    style_name = trade_style.lower() if trade_style != "UNKNOWN" else "trade"
-
-    return f"**{action_verb}  {asset_name}     {asset_name}     {style_name}**\n\n---\n\n"
 
 
 def generate_key_metrics(data: Dict[str, Any]) -> str:
@@ -458,8 +492,9 @@ def convert_json_to_markdown(json_data: Dict[str, Any]) -> str:
     markdown = ""
     # Top section matching holy grail format
     markdown += generate_header(json_data)
+
+    # Agent verdicts section
     markdown += generate_agent_verdicts(json_data)
-    markdown += generate_trade_action_line(json_data)
 
     # Details sections
     markdown += generate_key_metrics(json_data)

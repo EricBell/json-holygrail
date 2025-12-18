@@ -1,0 +1,115 @@
+{
+  "status": "ready",
+  "ticker": "FCEL",
+  "asset_type": "STOCKS",
+  "trade_style": "DAY",
+  "account_size": 50000,
+  "risk_percent": 0.96,
+  "agent_verdicts": {
+    "technical": {
+      "direction": "long",
+      "confidence": 86,
+      "entry_type": "pullback",
+      "support_levels": {
+        "minor": [10.00, 9.85],
+        "major": [9.50]
+      },
+      "resistance_levels": {
+        "minor": [10.40],
+        "major": [10.65]
+      },
+      "chart_patterns": ["Pullback after breakout"],
+      "mtf_alignment": "strong",
+      "volatility": "moderate",
+      "reasoning": [
+        "Classic Pullback After Breakout setup.",
+        "Stock rallied to $10.38 and is consolidating beautifully above VWAP ($10.12) and key breakout support ($10.00)."
+      ]
+    },
+    "macro": {
+      "market_regime": "bearish",
+      "confidence": 60,
+      "spy_direction": "bearish",
+      "qqq_direction": "neutral",
+      "cross_asset_alignment": "mixed",
+      "reasoning": ["Market showing weakness"]
+    },
+    "wild_card": {
+      "overall_risk_assessment": "fundamental_risk",
+      "wild_cards_identified": [],
+      "recommended_contingencies": ["Monitor for sector rotation"],
+      "timing_considerations": ["Trade in first 2 hours"],
+      "honest_uncertainty": "Market headwinds could pressure stock"
+    }
+  },
+  "trade_plan": {
+    "trade": true,
+    "verdict": {
+      "action": "BUY STOCK",
+      "confidence": "86%"
+    },
+    "entry": {
+      "direction": "LONG",
+      "recommendation": "limit_order",
+      "ideal_zone": {
+        "low": 10.15,
+        "mid": 10.25,
+        "high": 10.35,
+        "confidence": "high"
+      },
+      "current_price": 10.25,
+      "wait_for": "Wait for price to pull back/consolidate into the $10.15–$10.35 zone (above VWAP), then BUY upon signs of stabilization."
+    },
+    "position": {
+      "size_recommendation": "full",
+      "quantity": 500,
+      "unit_type": "shares",
+      "total_cost": "$5,125.00",
+      "max_risk": "$480.00",
+      "rationale": "Full position based on high confidence setup"
+    },
+    "exits": {
+      "stop_loss": {
+        "price_range": [9.85, 9.95],
+        "total_loss": "$480.00",
+        "rationale": "Below VWAP and breakout support"
+      },
+      "profit_targets": [
+        {
+          "target": 1,
+          "price_range": [10.40, 10.65],
+          "position_percent": 100,
+          "probability": "high"
+        }
+      ],
+      "time_stop": {
+        "date_or_duration": "End of trading day",
+        "rationale": "Day trade only"
+      }
+    },
+    "wild_cards": {
+      "identified_risks": [
+        {
+          "risk": "Market reversal",
+          "probability": "medium",
+          "impact": "high",
+          "contingency": "Exit if market breaks support"
+        }
+      ],
+      "manual_checks_required": ["Check market trend"],
+      "honest_uncertainty": "Macro headwinds present uncertainty"
+    },
+    "execution_plan": {
+      "step_1": "Wait for pullback into entry zone",
+      "step_2": "Place limit order at $10.25",
+      "step_3": "Set stop at $9.90"
+    }
+  },
+  "pre_trade_checks": {
+    "safe_to_trade": true,
+    "warnings": [],
+    "critical_events": [],
+    "news_summary": "Clean energy sector active",
+    "manual_check_required": false
+  }
+}
