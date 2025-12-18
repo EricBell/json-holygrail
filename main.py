@@ -42,25 +42,60 @@ def format_dict_as_list(data: Dict[str, Any], label_suffix: str = "") -> str:
 
 
 def generate_header(data: Dict[str, Any]) -> str:
-    """Generate the header section"""
+    """Generate the header section matching holy grail format"""
     trade_plan = data.get("trade_plan", {})
     verdict = trade_plan.get("verdict", {})
+    entry = trade_plan.get("entry", {})
 
+    # Extract key information
     action = verdict.get("action", "NO ACTION")
     confidence = verdict.get("confidence", "Unknown")
     ticker = data.get("ticker", "UNKNOWN")
     asset_type = data.get("asset_type", "UNKNOWN")
     trade_style = data.get("trade_style", "UNKNOWN")
+    direction = entry.get("direction", "UNKNOWN")
 
-    header = f"""# Trading Plan: {ticker}
+    # Extract action verb (BUY/SELL/SHORT) and asset type
+    action_parts = action.split()
+    action_verb = action_parts[0] if action_parts else "TRADE"
+    asset_name = " ".join(action_parts[1:]) if len(action_parts) > 1 else "ASSET"
 
-## {action}
-**Confidence**: {confidence}
-**Asset Type**: {asset_type} | **Trade Style**: {trade_style}
+    header = f"""# {direction.upper()}
+
+**Confidence**: {confidence} | **{ticker}** | **{asset_type}** | **{trade_style}**
 
 ---
+
 """
     return header
+
+
+def generate_trade_action_line(data: Dict[str, Any]) -> str:
+    """Generate the trade action line matching holy grail format (e.g., 'buy stock     stock     day')"""
+    trade_plan = data.get("trade_plan", {})
+    verdict = trade_plan.get("verdict", {})
+
+    action = verdict.get("action", "NO ACTION")
+    asset_type = data.get("asset_type", "UNKNOWN")
+    trade_style = data.get("trade_style", "UNKNOWN")
+
+    # Extract action verb (BUY, SELL, SHORT, etc.)
+    action_parts = action.split()
+    action_verb = action_parts[0].lower() if action_parts else "trade"
+
+    # Map asset type to simple name
+    asset_name = asset_type.lower() if asset_type != "UNKNOWN" else "asset"
+    if "STOCK" in asset_type.upper():
+        asset_name = "stock"
+    elif "FUTURES" in asset_type.upper() or "FUTURE" in asset_type.upper():
+        asset_name = "futures"
+    elif "OPTION" in asset_type.upper():
+        asset_name = "options"
+
+    # Map trade style
+    style_name = trade_style.lower() if trade_style != "UNKNOWN" else "trade"
+
+    return f"**{action_verb}  {asset_name}     {asset_name}     {style_name}**\n\n---\n\n"
 
 
 def generate_key_metrics(data: Dict[str, Any]) -> str:
@@ -89,7 +124,7 @@ def generate_key_metrics(data: Dict[str, Any]) -> str:
 
 
 def generate_agent_verdicts(data: Dict[str, Any]) -> str:
-    """Generate agent verdicts section"""
+    """Generate agent verdicts section - three columns like holy grail"""
     agents = data.get("agent_verdicts", {})
     technical = agents.get("technical", {})
     macro = agents.get("macro", {})
@@ -97,10 +132,22 @@ def generate_agent_verdicts(data: Dict[str, Any]) -> str:
 
     output = "## Agent Verdicts\n\n"
 
-    # Technical Agent
+    # Create three-column display
+    output += "| **TECHNICAL** | **MACRO** | **WILD CARD** |\n"
+    output += "|---------------|-----------|---------------|\n"
+
+    # Row 1: Directions/Verdicts
+    tech_dir = technical.get('direction', 'Unknown').upper()
+    tech_conf = technical.get('confidence', 0)
+    macro_regime = macro.get('market_regime', 'Unknown').replace('_', ' ').upper()
+    macro_conf = macro.get('confidence', 0)
+    risk_assessment = wild_card.get('overall_risk_assessment', 'Unknown').upper()
+
+    output += f"| **{tech_dir}** ({tech_conf}%) | **{macro_regime}** ({macro_conf}%) | **{risk_assessment}** |\n\n"
+
+    # Technical Agent Details
     output += "### Technical Agent\n\n"
-    output += f"**Direction**: {technical.get('direction', 'Unknown').upper()} | "
-    output += f"**Confidence**: {technical.get('confidence', 0)}%\n\n"
+    output += f"**Direction**: {tech_dir} | **Confidence**: {tech_conf}%\n\n"
     output += f"**Entry Type**: {technical.get('entry_type', 'Unknown').replace('_', ' ').title()}\n\n"
 
     # Support Levels
@@ -409,9 +456,13 @@ def convert_json_to_markdown(json_data: Dict[str, Any]) -> str:
         return f"# No Trade Recommended\n\n**Reason**: {no_trade_reason}\n"
 
     markdown = ""
+    # Top section matching holy grail format
     markdown += generate_header(json_data)
-    markdown += generate_key_metrics(json_data)
     markdown += generate_agent_verdicts(json_data)
+    markdown += generate_trade_action_line(json_data)
+
+    # Details sections
+    markdown += generate_key_metrics(json_data)
     markdown += generate_trade_details(json_data)
     markdown += generate_exit_strategy(json_data)
     markdown += generate_wild_cards_warnings(json_data)
