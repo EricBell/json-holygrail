@@ -421,8 +421,6 @@ def convert_json_to_markdown(json_data: Dict[str, Any]) -> str:
     return markdown
 
 
-app = typer.Typer(help="Trading Plan JSON to Markdown Converter")
-
 def version_callback(value: bool):
     """Show version and exit"""
     if value:
@@ -430,22 +428,7 @@ def version_callback(value: bool):
         typer.echo(f"v{major}.{minor}.{patch}")
         raise typer.Exit()
 
-@app.callback()
-def callback(
-    version: Optional[bool] = typer.Option(
-        None,
-        "--version",
-        "-v",
-        help="Show version and exit",
-        callback=version_callback,
-        is_eager=True,
-    )
-):
-    """Trading Plan JSON to Markdown Converter"""
-    pass
-
-@app.command()
-def convert(
+def main(
     input_file: Path = typer.Argument(
         ...,
         help="Input JSON file containing trading plan data",
@@ -458,23 +441,34 @@ def convert(
         None,
         "--output",
         "-o",
-        help="Output markdown file (default: same name as input with .md extension)",
+        help="Output markdown file path (must include .md extension)",
         file_okay=True,
         dir_okay=False,
     ),
+    version: Optional[bool] = typer.Option(
+        None,
+        "--version",
+        "-v",
+        help="Show version and exit",
+        callback=version_callback,
+        is_eager=True,
+    )
 ):
     """
+    Trading Plan JSON to Markdown Converter
+
     Convert trading plan JSON file to formatted markdown document.
+    Output file defaults to same location and name as input with .md extension.
 
     Examples:
-      python main.py convert trade-plan-MES-2025-12-14.json
-      python main.py convert input.json -o output.md
+      python main.py trade-plan-MES-2025-12-14.json
+      python main.py input.json -o /path/to/output.md
     """
     # Determine output file
     if output:
         output_file = output
     else:
-        # Auto-generate output filename
+        # Auto-generate output filename in same directory as input
         output_file = input_file.with_suffix(".md")
 
     # Read JSON file
@@ -501,10 +495,5 @@ def convert(
         raise typer.Exit(1)
 
 
-def main():
-    """Main entry point for setuptools console_scripts"""
-    app()
-
-
 if __name__ == "__main__":
-    app()
+    typer.run(main)

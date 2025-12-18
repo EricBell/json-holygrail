@@ -1,11 +1,11 @@
 {
   "major": 0,
   "minor": 1,
-  "patch": 2,
+  "patch": 3,
   "file_hashes": {
     "PRD.md": "e56bfc1eefb816825a3b3a525424ee35f3d29648fc81d25f887c6a69cf9e84c9",
     "README.md": "77b1f7acf7885d8778eba4adc8280d4957231bcbf052c3b2b126cd89084536b3",
-    "main.py": "6e3c9538d40f80672ce5a5bd76f92cfeb80cd9a3cb1f472081c3fd2d0e0f75af",
+    "main.py": "db12a3e54c781e2ae8fa65fb7e62822092c17bef4e7364dfc3bfd0226641aae7",
     "pyproject.toml": "e842d4bdf52578dbf12128e4e6638214bc8c6141cccd479f6ea6a0ff4d836ec5",
     "test_main.py": "8a0d26fac11a4c08112da008a073196d5150bb1b87cd9ed2cacd59038777d49a",
     "version_manager.py": "f9895b62c6f7bf1b9a7075eff51eecb559457102c6aa5173b1ce620c9a5416a6"
