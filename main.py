@@ -516,14 +516,11 @@ def version_callback(value: bool):
         typer.echo(f"v{major}.{minor}.{patch}")
         raise typer.Exit()
 
-def main(
-    input_file: Path = typer.Argument(
-        ...,
+
+def cli_main(
+    input_file: Optional[Path] = typer.Argument(
+        None,
         help="Input JSON file containing trading plan data",
-        exists=True,
-        file_okay=True,
-        dir_okay=False,
-        readable=True,
     ),
     output: Optional[Path] = typer.Option(
         None,
@@ -549,9 +546,21 @@ def main(
     Output file defaults to same location and name as input with .md extension.
 
     Examples:
-      python main.py trade-plan-MES-2025-12-14.json
-      python main.py input.json -o /path/to/output.md
+      json-holygrail trade-plan-MES-2025-12-14.json
+      json-holygrail input.json -o /path/to/output.md
     """
+    # Check if input file was provided
+    if input_file is None:
+        typer.echo("Error: Missing required argument INPUT_FILE", err=True)
+        typer.echo("\nUsage: json-holygrail [OPTIONS] INPUT_FILE", err=True)
+        typer.echo("\nTry 'json-holygrail --help' for help.", err=True)
+        raise typer.Exit(1)
+
+    # Validate input file exists
+    if not input_file.exists():
+        typer.echo(f"Error: File not found: {input_file}", err=True)
+        raise typer.Exit(1)
+
     # Determine output file
     if output:
         output_file = output
@@ -563,9 +572,6 @@ def main(
     try:
         with open(input_file, "r", encoding="utf-8") as f:
             json_data = json.load(f)
-    except FileNotFoundError:
-        typer.echo(f"Error: File not found: {input_file}", err=True)
-        raise typer.Exit(1)
     except json.JSONDecodeError as e:
         typer.echo(f"Error: Invalid JSON in {input_file}: {e}", err=True)
         raise typer.Exit(1)
@@ -583,5 +589,10 @@ def main(
         raise typer.Exit(1)
 
 
+def main():
+    """Entry point for console script"""
+    typer.run(cli_main)
+
+
 if __name__ == "__main__":
-    typer.run(main)
+    typer.run(cli_main)
