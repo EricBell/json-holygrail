@@ -1,19 +1,20 @@
 from setuptools import setup
-from setuptools.command.install import install
+from setuptools.command.build_py import build_py
 import shutil
 import os
 
-class CustomInstall(install):
+class CustomBuildPy(build_py):
     def run(self):
-        install.run(self)
-        # Copy version.json to the same directory as the installed modules
-        if self.install_lib:
+        build_py.run(self)
+        # Copy version.json to the build directory
+        if not self.dry_run:
             src = os.path.join(os.path.dirname(__file__), 'version.json')
-            dst = os.path.join(self.install_lib, 'version.json')
+            dst = os.path.join(self.build_lib, 'version.json')
             if os.path.exists(src):
+                self.mkpath(os.path.dirname(dst))
                 shutil.copy2(src, dst)
 
 setup(
     py_modules=['main', 'version_manager'],
-    cmdclass={'install': CustomInstall},
+    cmdclass={'build_py': CustomBuildPy},
 )
