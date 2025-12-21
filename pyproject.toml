@@ -1,7 +1,11 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "json-holygrail"
 version = "0.1.0"
-description = "Add your description here"
+description = "Trading Plan JSON to Markdown Converter"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = []
@@ -11,3 +15,6 @@ dev = [
     "pytest>=8.0.0",
     "pytest-cov>=4.1.0",
 ]
+
+[tool.setuptools]
+py-modules = ["main", "version_manager"]

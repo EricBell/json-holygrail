@@ -7,7 +7,9 @@ Converts structured trading plan JSON into formatted markdown documents
 import json
 import sys
 from pathlib import Path
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
+import typer
+from version_manager import version_manager
 
 
 def format_price(value: Any) -> str:
@@ -40,23 +42,94 @@ def format_dict_as_list(data: Dict[str, Any], label_suffix: str = "") -> str:
 
 
 def generate_header(data: Dict[str, Any]) -> str:
-    """Generate the header section"""
+    """Generate the top boxed section matching holy grail format"""
     trade_plan = data.get("trade_plan", {})
     verdict = trade_plan.get("verdict", {})
+    entry = trade_plan.get("entry", {})
+    position = trade_plan.get("position", {})
+    exits = trade_plan.get("exits", {})
 
-    action = verdict.get("action", "NO ACTION")
-    confidence = verdict.get("confidence", "Unknown")
+    # 1. Stock Identifier, Trade Direction, Confidence
     ticker = data.get("ticker", "UNKNOWN")
-    asset_type = data.get("asset_type", "UNKNOWN")
-    trade_style = data.get("trade_style", "UNKNOWN")
+    direction = entry.get("direction", "UNKNOWN").upper()
+    confidence = verdict.get("confidence", "Unknown")
 
-    header = f"""# Trading Plan: {ticker}
+    # 2. Trade Notes/Instruction Box
+    wait_for = entry.get("wait_for", "No specific entry instructions provided")
+    ideal_zone = entry.get("ideal_zone", {})
 
-## {action}
+    # 3. Trade Parameter Cards
+    size_rec = position.get("size_recommendation", "Unknown").upper()
+
+    stop_loss = exits.get("stop_loss", {})
+    stop_range = stop_loss.get("price_range", [])
+    if stop_range and len(stop_range) >= 1:
+        stop_text = f"${stop_range[0]:.2f}" if len(stop_range) == 1 else f"${stop_range[0]:.2f} – ${stop_range[-1]:.2f}"
+    else:
+        stop_text = "Not set"
+
+    profit_targets = exits.get("profit_targets", [])
+    if profit_targets and len(profit_targets) > 0:
+        target = profit_targets[0]
+        target_range = target.get("price_range", [])
+        if target_range and len(target_range) >= 1:
+            target_text = f"${target_range[0]:.2f}" if len(target_range) == 1 else f"${target_range[0]:.2f} – ${target_range[-1]:.2f}"
+        else:
+            target_text = "Not set"
+    else:
+        target_text = "Not set"
+
+    risk_percent = data.get("risk_percent", 0)
+    max_risk = position.get("max_risk", "Unknown")
+    risk_note = f"Risk {risk_percent}% of account ({max_risk})"
+
+    # 4. Technical Alignment Summary (we'll pull from technical agent reasoning)
+    agents = data.get("agent_verdicts", {})
+    technical = agents.get("technical", {})
+    tech_reasoning = technical.get("reasoning", [])
+    tech_summary = " ".join(tech_reasoning[:2]) if tech_reasoning else "No technical summary available"
+
+    # 5. Action Buttons
+    action = verdict.get("action", "TRADE ASSET")
+    asset_type = data.get("asset_type", "ASSET")
+    trade_style = data.get("trade_style", "TRADE")
+
+    # Extract action verb
+    action_parts = action.split()
+    action_verb = action_parts[0] if action_parts else "TRADE"
+
+    # Map asset type to simple name
+    if "STOCK" in asset_type.upper():
+        asset_name = "STOCK"
+    elif "FUTURES" in asset_type.upper() or "FUTURE" in asset_type.upper():
+        asset_name = "FUTURES"
+    elif "OPTION" in asset_type.upper():
+        asset_name = "OPTIONS"
+    else:
+        asset_name = "ASSET"
+
+    header = f"""# {ticker} {direction}
+
 **Confidence**: {confidence}
-**Asset Type**: {asset_type} | **Trade Style**: {trade_style}
+
+## Trigger
+> {wait_for}
+
+## Trade Parameters
+
+| **Position Size** | **Stop Loss** | **Target** | **Risk Note** |
+|-------------------|---------------|------------|---------------|
+| {size_rec} | {stop_text} | {target_text} | {risk_note} |
+
+## Technical Alignment
+{tech_summary}
 
 ---
+
+**{action_verb} {asset_name}     {asset_name}     {trade_style}**
+
+---
+
 """
     return header
 
@@ -87,7 +160,7 @@ def generate_key_metrics(data: Dict[str, Any]) -> str:
 
 
 def generate_agent_verdicts(data: Dict[str, Any]) -> str:
-    """Generate agent verdicts section"""
+    """Generate agent verdicts section - three columns like holy grail"""
     agents = data.get("agent_verdicts", {})
     technical = agents.get("technical", {})
     macro = agents.get("macro", {})
@@ -95,10 +168,22 @@ def generate_agent_verdicts(data: Dict[str, Any]) -> str:
 
     output = "## Agent Verdicts\n\n"
 
-    # Technical Agent
+    # Create three-column display
+    output += "| **TECHNICAL** | **MACRO** | **WILD CARD** |\n"
+    output += "|---------------|-----------|---------------|\n"
+
+    # Row 1: Directions/Verdicts
+    tech_dir = technical.get('direction', 'Unknown').upper()
+    tech_conf = technical.get('confidence', 0)
+    macro_regime = macro.get('market_regime', 'Unknown').replace('_', ' ').upper()
+    macro_conf = macro.get('confidence', 0)
+    risk_assessment = wild_card.get('overall_risk_assessment', 'Unknown').upper()
+
+    output += f"| **{tech_dir}** ({tech_conf}%) | **{macro_regime}** ({macro_conf}%) | **{risk_assessment}** |\n\n"
+
+    # Technical Agent Details
     output += "### Technical Agent\n\n"
-    output += f"**Direction**: {technical.get('direction', 'Unknown').upper()} | "
-    output += f"**Confidence**: {technical.get('confidence', 0)}%\n\n"
+    output += f"**Direction**: {tech_dir} | **Confidence**: {tech_conf}%\n\n"
     output += f"**Entry Type**: {technical.get('entry_type', 'Unknown').replace('_', ' ').title()}\n\n"
 
     # Support Levels
@@ -407,9 +492,14 @@ def convert_json_to_markdown(json_data: Dict[str, Any]) -> str:
         return f"# No Trade Recommended\n\n**Reason**: {no_trade_reason}\n"
 
     markdown = ""
+    # Top section matching holy grail format
     markdown += generate_header(json_data)
-    markdown += generate_key_metrics(json_data)
+
+    # Agent verdicts section
     markdown += generate_agent_verdicts(json_data)
+
+    # Details sections
+    markdown += generate_key_metrics(json_data)
     markdown += generate_trade_details(json_data)
     markdown += generate_exit_strategy(json_data)
     markdown += generate_wild_cards_warnings(json_data)
@@ -419,39 +509,72 @@ def convert_json_to_markdown(json_data: Dict[str, Any]) -> str:
     return markdown
 
 
-def main():
-    """Main entry point"""
-    if len(sys.argv) < 2:
-        print("Usage: python main.py <input.json> [output.md]")
-        print("\nExamples:")
-        print("  python main.py trade-plan-MES-2025-12-14.json")
-        print("  python main.py input.json output.md")
-        print("  python main.py input.json -o output.md")
-        sys.exit(1)
+def version_callback(value: bool):
+    """Show version and exit"""
+    if value:
+        major, minor, patch = version_manager.get_current_version()
+        typer.echo(f"v{major}.{minor}.{patch}")
+        raise typer.Exit()
 
-    input_file = Path(sys.argv[1])
+
+def cli_main(
+    input_file: Optional[Path] = typer.Argument(
+        None,
+        help="Input JSON file containing trading plan data",
+    ),
+    output: Optional[Path] = typer.Option(
+        None,
+        "--output",
+        "-o",
+        help="Output markdown file path (must include .md extension)",
+        file_okay=True,
+        dir_okay=False,
+    ),
+    version: Optional[bool] = typer.Option(
+        None,
+        "--version",
+        "-v",
+        help="Show version and exit",
+        callback=version_callback,
+        is_eager=True,
+    )
+):
+    """
+    Trading Plan JSON to Markdown Converter
+
+    Convert trading plan JSON file to formatted markdown document.
+    Output file defaults to same location and name as input with .md extension.
+
+    Examples:
+      json-holygrail trade-plan-MES-2025-12-14.json
+      json-holygrail input.json -o /path/to/output.md
+    """
+    # Check if input file was provided
+    if input_file is None:
+        typer.echo("Error: Missing required argument INPUT_FILE", err=True)
+        typer.echo("\nUsage: json-holygrail [OPTIONS] INPUT_FILE", err=True)
+        typer.echo("\nTry 'json-holygrail --help' for help.", err=True)
+        raise typer.Exit(1)
+
+    # Validate input file exists
+    if not input_file.exists():
+        typer.echo(f"Error: File not found: {input_file}", err=True)
+        raise typer.Exit(1)
 
     # Determine output file
-    if len(sys.argv) >= 4 and sys.argv[2] == "-o":
-        # Format: python main.py input.json -o output.md
-        output_file = Path(sys.argv[3])
-    elif len(sys.argv) >= 3:
-        # Format: python main.py input.json output.md
-        output_file = Path(sys.argv[2])
+    if output:
+        output_file = output
     else:
-        # Auto-generate output filename
+        # Auto-generate output filename in same directory as input
         output_file = input_file.with_suffix(".md")
 
     # Read JSON file
     try:
         with open(input_file, "r", encoding="utf-8") as f:
             json_data = json.load(f)
-    except FileNotFoundError:
-        print(f"Error: File not found: {input_file}")
-        sys.exit(1)
     except json.JSONDecodeError as e:
-        print(f"Error: Invalid JSON in {input_file}: {e}")
-        sys.exit(1)
+        typer.echo(f"Error: Invalid JSON in {input_file}: {e}", err=True)
+        raise typer.Exit(1)
 
     # Convert to markdown
     markdown_content = convert_json_to_markdown(json_data)
@@ -460,11 +583,16 @@ def main():
     try:
         with open(output_file, "w", encoding="utf-8") as f:
             f.write(markdown_content)
-        print(f"✅ Successfully converted {input_file} to {output_file}")
+        typer.echo(f"✅ Successfully converted {input_file} to {output_file}")
     except IOError as e:
-        print(f"Error: Could not write to {output_file}: {e}")
-        sys.exit(1)
+        typer.echo(f"Error: Could not write to {output_file}: {e}", err=True)
+        raise typer.Exit(1)
+
+
+def main():
+    """Entry point for console script"""
+    typer.run(cli_main)
 
 
 if __name__ == "__main__":
-    main()
+    typer.run(cli_main)

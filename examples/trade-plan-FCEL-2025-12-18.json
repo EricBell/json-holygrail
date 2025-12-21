@@ -1,0 +1,275 @@
+{
+  "status": "success",
+  "ticker": "FCEL",
+  "requested_ticker": null,
+  "resolved_ticker": null,
+  "resolved_ticker_method": null,
+  "asset_type": "STOCK",
+  "trade_style": "DAY",
+  "account_size": 10000,
+  "risk_percent": 1,
+  "agent_verdicts": {
+    "technical": {
+      "direction": "long",
+      "confidence": 85,
+      "entry_type": "pullback_after_breakout",
+      "support_levels": {
+        "minor": [
+          10.3,
+          10.15,
+          10.12
+        ],
+        "major": [
+          10.04,
+          9.52,
+          9.25
+        ],
+        "key_references": {
+          "pdc": 7.91,
+          "pdl": 9.25,
+          "opening_range_low": 9.25,
+          "vwap": 10.12
+        }
+      },
+      "resistance_levels": {
+        "minor": [
+          10.43,
+          10.54,
+          10.63
+        ],
+        "major": [
+          10.84,
+          11
+        ],
+        "key_references": {
+          "pdh": 10.84,
+          "opening_range_high": 10.63,
+          "psychological": 10.5
+        }
+      },
+      "chart_patterns": [
+        "Bull Flag",
+        "High Tight Flag"
+      ],
+      "mtf_alignment": "aligned",
+      "volatility": "extreme",
+      "options_flow": "unavailable",
+      "reasoning": [
+        "Factor 1: Extreme Momentum (+30% move today) fueled by massive volume inflows (recent bars >200k-500k vs avg <10k), indicating institutional participation.",
+        "Factor 2: Textbook 'Pullback After Breakout' setup. The stock rallied from $9.52 to $10.63 and is now consolidating near $10.30, holding above the rising SMA(20) ($10.30) and VWAP ($10.12).",
+        "Factor 3: Mike's Framework application: We do not short strong momentum in a risk-on move. We wait for the price to come to support. The $10.15-$10.30 zone offers a high R/R entry with stops below the $10.00 breakout level."
+      ]
+    },
+    "macro": {
+      "market_regime": "risk_on",
+      "confidence": 85,
+      "spy_direction": "up",
+      "qqq_direction": "up",
+      "cross_asset_alignment": "aligned",
+      "intermarket_divergence": "in_sync",
+      "session_context": {
+        "type": "regular",
+        "risk_note": "Intraday momentum is strong; lacking specific ticker price data to confirm ticker beta correlation."
+      },
+      "economic_assessment": {
+        "inflation_trend": "unknown",
+        "fed_stance_implied": "unknown",
+        "yield_curve_signal": "unknown",
+        "macro_headwinds": [
+          "Economic data provided is stale (108 days old)",
+          "Inflation values appear to be index levels rather than YoY percentages"
+        ],
+        "macro_tailwinds": [
+          "Strong risk appetite indicated by QQQ outperformance",
+          "Broad market participation (SPY and QQQ both up)"
+        ]
+      },
+      "news_sentiment": {
+        "overall": "neutral",
+        "key_themes": [],
+        "major_concerns": []
+      },
+      "international_assessment": {
+        "asia_sentiment": "unavailable",
+        "europe_sentiment": "unavailable",
+        "gap_bias": "flat",
+        "relevance": "low"
+      },
+      "reasoning": [
+        "Factor 1: Strong Risk-On Signal - QQQ (+1.09%) is significantly outperforming SPY (+0.64%), indicating investors are favoring growth and risk assets.",
+        "Factor 2: Market Alignment - Both major indices are moving in the same direction with conviction, suggesting broad buying pressure.",
+        "Factor 3: Sector Relevance - FCEL (Clean Energy/Tech) typically correlates highly with QQQ; the strong tech bid is a favorable tailwind for the ticker.",
+        "Factor 4: Data Limitation - Macro economic data provided is stale (>3 months old) and values appear to be index levels, preventing immediate fundamental assessment.",
+        "Factor 5: Session Context - Active trading session with clear directional momentum favors trend-following strategies."
+      ]
+    },
+    "wild_card": {
+      "wild_cards_identified": [
+        {
+          "type": "external_event",
+          "description": "Sector Sympathy Shock (PLUG/BE connection)",
+          "probability": "medium",
+          "impact": "moderate",
+          "mitigation": "Keep a quote window open for PLUG and BE (Plug Power / Bloom Energy). If they spike or flush, FCEL will likely follow immediately, regardless of its own technicals."
+        },
+        {
+          "type": "timing",
+          "description": "Lunch Hour Liquidity Trap (12:00 PM - 1:00 PM ET)",
+          "probability": "high",
+          "impact": "moderate",
+          "mitigation": "As per Mike's Rules for small/mid-caps: Do not initiate new entries during this window unless experiencing a massive volume breakout to High of Day. Plan to trim or exit positions before 12:00 PM."
+        },
+        {
+          "type": "external_event",
+          "description": "Energy Policy/Commodity Headline Risk",
+          "probability": "low",
+          "impact": "severe",
+          "mitigation": "FCEL is highly sensitive to Nat Gas prices and Green Energy policy rumors. Use hard stops to protect against sudden headlines regarding government subsidies or sudden spikes in energy futures."
+        },
+        {
+          "type": "execution",
+          "description": "Low-Price Percentage Volatility (Whipsaw)",
+          "probability": "high",
+          "impact": "moderate",
+          "mitigation": "Because FCEL trades at a lower dollar price, small cent moves = large percentage PnL swings. Calculate position size based on max dollar loss, not share count, to account for 'noise' volatility."
+        }
+      ],
+      "overall_risk_assessment": "moderate",
+      "recommended_contingencies": [
+        "Contingency 1: If PLUG/BE drop >3% rapidly, close FCEL long immediately (do not wait for stop).",
+        "Contingency 2: If price chops sideways entering 11:45 AM, close 50-75% of position to avoid Lunch Hour theta/decay or fake-outs.",
+        "Contingency 3: Use market orders for exits if news breaks; limit orders may not fill in a fast spike/flush."
+      ],
+      "timing_considerations": [
+        "Current Time (9:49 AM): Volatility from the open is settling. Establish direction now.",
+        "12:00 PM - 1:00 PM: Dead zone risk. Avoid new entries.",
+        "3:30 PM - 4:00 PM: Intraday square-up volatility (only relevant if holding late)."
+      ],
+      "honest_uncertainty": "We cannot predict sudden social media 'pumps' or short squeezes, as FCEL often attracts retail meme-stock attention which defies technical logic. We also cannot predict intraday analyst notes dropping unexpectedly."
+    }
+  },
+  "trade_plan": {
+    "trade": true,
+    "verdict": {
+      "action": "BUY STOCK",
+      "confidence": "80% confidence - means high conviction due to alignment of technicals (bull flag), momentum (+30% move), and macro tailwinds (risk-on tech/clean energy flows). Capped at 80% due to extreme volatility requiring precise execution.",
+      "reasoning": [
+        "Technical Alignment: Classic 'Pullback After Breakout' setup. Stock rallied to $10.63 and is consolidating beautifully above VWAP ($10.12) and key breakout support ($10.00).",
+        "Macro Confirmation: Risk-on regime defined by QQQ strength aligns perfectly with FCEL's high-beta correlation to growth/tech.",
+        "Mike's Methodology: We are not chasing the high ($10.63). We are waiting for the price to come to us at support ($10.15-$10.30) to define risk clearly against the $10.00 psychological level."
+      ]
+    },
+    "synthesis": {
+      "technical_confidence": 85,
+      "macro_confidence": 85,
+      "wild_card_risk": "moderate",
+      "agent_agreement": "full",
+      "conflict_resolution": "No conflict. Both agents strong bullish. Wild Card agent provided critical timing and correlation warnings which are integrated into the execution plan."
+    },
+    "entry": {
+      "direction": "LONG",
+      "recommendation": "buy_support_bounce",
+      "ideal_zone": {
+        "low": 10.15,
+        "mid": 10.22,
+        "high": 10.35,
+        "confidence": "85% likely to hold as new support floor"
+      },
+      "current_price": 10.3,
+      "wait_for": "Wait for price to pull back/consolidate into the $10.15-$10.30 zone (above VWAP), then BUY upon signs of stabilization."
+    },
+    "position": {
+      "size_recommendation": "full",
+      "rationale": "Mike's methodology: Enter full size at support where risk is defined. Volatility is high, so position size is dictated by dollar risk stop, not capital available.",
+      "quantity": 300,
+      "unit_type": "shares",
+      "total_cost": "$3,075 (approx)",
+      "max_risk": "$96.00 (0.96% of account) based on stop at $9.90"
+    },
+    "exits": {
+      "stop_loss": {
+        "price_range": [
+          9.85,
+          9.95
+        ],
+        "total_loss": "$90-$120",
+        "rationale": "Structural stop placed just below the $10.00 psychological breakout level and major support at 10.04. If $10 fails, the breakout has failed."
+      },
+      "profit_targets": [
+        {
+          "target": 1,
+          "price_range": [
+            10.6,
+            10.65
+          ],
+          "position_percent": 50,
+          "probability": "70% chance (retest of HOD)"
+        },
+        {
+          "target": 2,
+          "price_range": [
+            10.84,
+            11
+          ],
+          "position_percent": 50,
+          "probability": "50% chance (extension to major resistance)"
+        }
+      ],
+      "time_stop": {
+        "date_or_duration": "Close by 4:00 PM ET",
+        "rationale": "Intraday momentum trade. extreme volatility makes holding overnight risky."
+      }
+    },
+    "wild_cards": {
+      "identified_risks": [
+        {
+          "risk": "Sector Sympathy Flush",
+          "probability": "medium",
+          "impact": "moderate",
+          "contingency": "Monitor PLUG and BE. If they drop >2% suddenly, exit FCEL immediately regardless of technicals."
+        },
+        {
+          "risk": "Lunch Hour Liquidity Trap",
+          "probability": "high",
+          "impact": "low",
+          "contingency": "Do not enter new positions between 12:00 PM and 1:00 PM ET. Manage existing positions tightly during this window."
+        }
+      ],
+      "manual_checks_required": [
+        "[!] Check PLUG/BE tickers for correlation",
+        "[!] Verify no pending midday energy news announcements"
+      ],
+      "honest_uncertainty": "We cannot predict if the +30% momentum will sustain or face profit-taking abruptly. Volatility is 'extreme', meaning slippage on stops is possible."
+    },
+    "execution_plan": {
+      "step_1": "Set limit orders to BUY in $10.15-$10.30 zone to catch the dip.",
+      "step_2": "Immediately place HARD STOP at $9.90 upon fill.",
+      "step_3": "Set alert at $10.60 for first profit take."
+    },
+    "no_trade_reason": null
+  },
+  "pre_trade_checks": {
+    "safe_to_trade": true,
+    "warnings": [
+      "[!] MANUAL CHECK REQUIRED: Verify economic calendar before trading",
+      "[!] Check for: FOMC, CPI, NFP, GDP releases",
+      "[!] Check for: Earnings if trading stocks/options"
+    ],
+    "critical_events": [],
+    "news_summary": "Automated news scraping disabled - check forexfactory.com/calendar manually",
+    "earnings_upcoming": false,
+    "major_events": [],
+    "manual_check_required": true
+  },
+  "error": null,
+  "runs_remaining": 156,
+  "in_trial": false,
+  "daily_runs_remaining": null,
+  "market_session": {
+    "status": "open",
+    "is_tradeable_now": true,
+    "next_market_open": null,
+    "timing_note": "Regular market hours.",
+    "asset_type": "STOCK"
+  }
+}
