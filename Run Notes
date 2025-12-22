@@ -1,0 +1,57 @@
+Here's how to run the app now:
+
+  Installation (First Time)
+
+  # From the project directory
+  ./install.sh
+
+  This installs the json-holygrail command globally in your environment.
+
+  Running the App
+
+  Basic Usage
+
+  # Convert a JSON file to markdown (uses default format)
+  json-holygrail examples/trade-plan-FCEL-2025-12-18.json
+
+  # This creates: examples/trade-plan-FCEL-2025-12-18.md
+
+  With Different Formats
+
+  # Use compact format
+  json-holygrail examples/trade-plan-FCEL-2025-12-18.json --format compact
+
+  # Use custom template
+  json-holygrail examples/trade-plan-FCEL-2025-12-18.json --format /path/to/custom.md
+
+  # Specify output file
+  json-holygrail input.json -o output.md
+
+  Other Commands
+
+  # List available formats
+  json-holygrail --list-formats
+
+  # Show version
+  json-holygrail --version
+
+  # Show help
+  json-holygrail --help
+
+  Alternative: Direct Python Execution
+
+  If you haven't installed it yet, you can also run it directly:
+
+  # Using uv (development)
+  uv run json-holygrail input.json
+
+  # Or as a module
+  uv run python -m json_holygrail.main input.json
+
+  Quick Test
+
+  Try it right now with the example file:
+
+  json-holygrail examples/trade-plan-FCEL-2025-12-18.json --format compact
+
+  This will create examples/trade-plan-FCEL-2025-12-18.md with the compact format!
