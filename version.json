@@ -1,14 +1,19 @@
 {
   "major": 0,
-  "minor": 1,
-  "patch": 9,
+  "minor": 2,
+  "patch": 0,
   "file_hashes": {
     "PRD.md": "e56bfc1eefb816825a3b3a525424ee35f3d29648fc81d25f887c6a69cf9e84c9",
-    "README.md": "77b1f7acf7885d8778eba4adc8280d4957231bcbf052c3b2b126cd89084536b3",
-    "main.py": "b34a66f09d6aee3ecfc0e204dd285565fe73c2f4d4edef970dcfd350a44e94f5",
-    "pyproject.toml": "39306df3206336068bb8aee43ee7ea3f46ea8349eae88cde5d6d2f941728f739",
-    "setup.py": "43c86f03f2b26dda4227ce569f7c0d305c3b0a06bf65361dedbc02a40a4ab6bb",
-    "test_main.py": "8a0d26fac11a4c08112da008a073196d5150bb1b87cd9ed2cacd59038777d49a",
-    "version_manager.py": "f9895b62c6f7bf1b9a7075eff51eecb559457102c6aa5173b1ce620c9a5416a6"
+    "README.md": "61d22c8f4160a1555304f16e450ceee479a305e729331fbd0a3a166978d1843f",
+    "json_holygrail/__init__.py": "d8a3ecd6aa3b78a04bfa03fa16bc6df7fa5a2ad2683bbae87366a02e99d05533",
+    "json_holygrail/config.py": "ed1cbddc8dd341862b0a7edbc6a85a9db78f60735dd53d0fd93cff3a79445961",
+    "json_holygrail/filters.py": "3526fde3534a3626abccdd365ac9498bef3a048fae2b3cbd8ccdcc317657df5c",
+    "json_holygrail/formats/__init__.py": "6d7a05f1732240e6cd99aa009e46719e80682804ff4288955e2a7460f3012070",
+    "json_holygrail/formats/compact.md": "78d881480f090589e6bba112b7c83755e9084e6542944a4c4062f1a050bd85d5",
+    "json_holygrail/formats/default.md": "9825ffb974778ce01ac5608b3f377ca83150b0dcc1668a9461d86e0f5a3408c8",
+    "json_holygrail/main.py": "07d3e25003934b6b59fa75ef4348ce543d075bf174897e0e434f3064135e217b",
+    "json_holygrail/renderer.py": "022dc3ec57464fa5c5f27807e322f554c86fd5473579eb55e34ea2a4b7e3162a",
+    "json_holygrail/version_manager.py": "65803b846d4a366994dc0879a4c86b0b92891ff2cd951834199fe42666218772",
+    "pyproject.toml": "c87b29ca13c258a2bfdbf0e50cecd0d3b9ec4e27ffbaac2f1c33b30eb76bd16f"
   }
 }
