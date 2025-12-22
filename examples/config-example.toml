@@ -1,0 +1,17 @@
+# json-holygrail Configuration File Example
+# Save this as .json-holygrail.toml in your project directory or home directory
+
+[format]
+# Set your default output format
+# Options:
+#   - "default"  - Full detailed format with all sections
+#   - "compact"  - Condensed format with emojis
+#   - "/path/to/custom.md" - Path to your custom template
+default = "default"
+
+# Future configuration options can be added here
+# [display]
+# show_timestamps = true
+#
+# [output]
+# auto_open = false

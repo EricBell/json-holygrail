@@ -1,9 +1,12 @@
 # json-holyGrail
 
-A Python tool that converts trading plan JSON files into formatted markdown documents.
+A Python tool that converts trading plan JSON files into formatted markdown documents using customizable Jinja2 templates.
 
 ## Features
 
+- **Multiple Output Formats**: Choose from embedded formats or create your own custom templates
+- **Jinja2 Template Engine**: Full control over markdown output formatting
+- **Configurable Defaults**: Set your preferred format in a config file
 - Converts comprehensive trading analysis JSON to readable markdown
 - Supports all trading plan sections: Technical, Macro, Wild Cards, Entry/Exit strategies
 - Handles futures, stocks, and other asset types
@@ -13,41 +16,75 @@ A Python tool that converts trading plan JSON files into formatted markdown docu
 ## Installation
 
 ```bash
-# Clone or navigate to the repository
-cd json-holyGrail
+# Clone the repository
+cd json-holygrail
 
-# Ensure Python 3.12+ is installed
-python --version
+# Install using the install script
+./install.sh
 ```
 
-No additional dependencies required - uses only Python standard library.
+**Requirements:**
+- Python 3.11+
+- Dependencies: `typer`, `jinja2` (installed automatically)
 
 ## Usage
 
 ### Basic Usage
 
 ```bash
-python main.py <input.json>
+json-holygrail <input.json>
 ```
 
-This will create a markdown file with the same name as your input file.
+This will create a markdown file with the same name as your input file using the default format.
 
 **Example:**
 ```bash
-python main.py trade-plan-MES-2025-12-14.json
+json-holygrail trade-plan-MES-2025-12-14.json
 # Creates: trade-plan-MES-2025-12-14.md
 ```
 
 ### Specify Output File
 
 ```bash
-python main.py <input.json> -o <output.md>
+json-holygrail <input.json> -o <output.md>
 ```
 
 **Example:**
 ```bash
-python main.py input.json -o my-trade-plan.md
+json-holygrail input.json -o my-trade-plan.md
 ```
+
+### Using Different Formats
+
+List available embedded formats:
+```bash
+json-holygrail --list-formats
+# Output:
+# Available embedded formats:
+#   - compact
+#   - default
+```
+
+Use a specific embedded format:
+```bash
+json-holygrail input.json --format compact
+```
+
+Use a custom external template:
+```bash
+json-holygrail input.json --format /path/to/custom-template.md
+```
+
+### Configuration File
+
+Create a `.json-holygrail.toml` file in your project directory or home directory to set default preferences:
+
+```toml
+[format]
+default = "compact"  # or "default" or "/path/to/custom.md"
+```
+
+Now when you run `json-holygrail input.json` without `--format`, it will use your configured default.
 
 ## Input Format
 
@@ -80,9 +117,10 @@ The tool expects a JSON file with the following structure:
 
 See the PRD.md file for complete schema details.
 
-## Output Format
+## Output Formats
 
-The generated markdown includes:
+### Default Format
+The default format generates comprehensive markdown with all sections:
 
 1. **Header** - Ticker, action (SHORT/LONG), confidence
 2. **Key Metrics** - Account size, risk %, max risk, current price
@@ -93,18 +131,99 @@ The generated markdown includes:
 7. **Execution Checklist** - Step-by-step execution plan
 8. **Pre-Trading Checklist** - Safety checks and warnings
 
+### Compact Format
+A condensed format with:
+- Quick stats and levels in one line
+- Emoji icons for visual clarity
+- Key information only
+- Perfect for quick reference
+
+## Creating Custom Templates
+
+You can create your own Jinja2 templates to customize the output format.
+
+### Template Basics
+
+Templates are written in Jinja2 syntax with access to all JSON data:
+
+```jinja2
+# {{ ticker }} {{ trade_plan.entry.direction | upper }}
+
+**Confidence**: {{ trade_plan.verdict.confidence }}%
+
+## Entry
+{{ trade_plan.entry.wait_for }}
+
+## Levels
+- Stop: {{ trade_plan.exits.stop_loss.price_range[0] | format_price }}
+- Target: {{ trade_plan.exits.profit_targets[0].price_range[0] | format_price }}
+```
+
+### Available Variables
+
+Your templates have access to the entire JSON structure:
+
+**Top-level:**
+- `ticker`, `status`, `asset_type`, `trade_style`
+- `account_size`, `risk_percent`
+- `agent_verdicts` (technical, macro, wild_card)
+- `trade_plan` (verdict, entry, position, exits, execution_plan)
+- `pre_trade_checks`
+
+**Examples:**
+```jinja2
+{{ ticker }}                                    # "AAPL"
+{{ trade_plan.entry.direction }}                # "long"
+{{ agent_verdicts.technical.confidence }}       # 85
+{{ trade_plan.exits.profit_targets[0].price_range[0] }}  # 150.50
+```
+
+### Available Filters
+
+Custom Jinja2 filters for formatting:
+
+| Filter | Usage | Example Output |
+|--------|-------|----------------|
+| `format_price` | `{{ 99.99 \| format_price }}` | `$99.99` |
+| `format_list` | `{{ items \| format_list }}` | Markdown bullets |
+| `title_case` | `{{ "snake_case" \| title_case }}` | `Snake Case` |
+| `join_list` | `{{ items \| join_list(", ") }}` | `A, B, C` |
+| `safe_get` | `{{ data \| safe_get("key", default="N/A") }}` | Safe nested access |
+
+### Template Example
+
+See `examples/custom-template-example.md` for a complete custom template example.
+
 ## Examples
 
 ### Convert a trading plan
 ```bash
-python main.py trade-plan-MES-2025-12-14.json
+json-holygrail examples/trade-plan-FCEL-2025-12-18.json
 ```
 
-**Output:** `trade-plan-MES-2025-12-14.md`
+**Output:** `examples/trade-plan-FCEL-2025-12-18.md` (using default format)
+
+### Use compact format
+```bash
+json-holygrail examples/trade-plan-FCEL-2025-12-18.json --format compact
+```
+
+### Create and use custom template
+```bash
+# Create your template
+cat > my-template.md << 'EOF'
+# {{ ticker }} Trade Plan
+**Direction**: {{ trade_plan.entry.direction | upper }}
+**Target**: {{ trade_plan.exits.profit_targets[0].price_range[0] | format_price }}
+EOF
+
+# Use it
+json-holygrail input.json --format my-template.md
+```
 
 ### View the generated markdown
 ```bash
-cat trade-plan-MES-2025-12-14.md
+cat examples/trade-plan-FCEL-2025-12-18.md
 # Or open in your favorite markdown viewer
 ```
 
@@ -119,12 +238,25 @@ The tool handles:
 ## Project Structure
 
 ```
-json-holyGrail/
-├── main.py              # Converter implementation
-├── PRD.md              # Product Requirements Document
-├── README.md           # This file
-├── pyproject.toml      # Project configuration
-└── .python-version     # Python version specification
+json-holygrail/
+├── json_holygrail/           # Main package
+│   ├── __init__.py          # Package initialization
+│   ├── main.py              # CLI and main logic
+│   ├── renderer.py          # Template rendering engine
+│   ├── filters.py           # Jinja2 custom filters
+│   ├── config.py            # Configuration management
+│   ├── version_manager.py   # Version tracking
+│   └── formats/             # Embedded templates
+│       ├── default.md       # Default format
+│       └── compact.md       # Compact format
+├── examples/                 # Example files
+│   ├── trade-plan-*.json    # Example trading plans
+│   └── custom-template-example.md  # Custom template example
+├── PRD.md                   # Product Requirements Document
+├── README.md                # This file
+├── pyproject.toml           # Project configuration
+├── setup.py                 # Build configuration
+└── install.sh               # Installation script
 ```
 
 ## Development
