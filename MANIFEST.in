@@ -1,2 +1,3 @@
+include json_holygrail/formats/*.md
+include json_holygrail/version.json
 include version.json
-global-include version.json
