@@ -19,10 +19,12 @@ class VersionManager:
     """Manages application versioning based on file hashes"""
     
     def __init__(self, project_root: str = None):
-        self.project_root = Path(project_root) if project_root else Path(__file__).parent
+        # Since version_manager.py is now in json_holygrail/, we need to go up one level
+        self.project_root = Path(project_root) if project_root else Path(__file__).parent.parent
         self.version_file = self.project_root / 'version.json'
         self.tracked_files = [
-            '*.py',
+            'json_holygrail/**/*.py',
+            'json_holygrail/formats/*.md',
             'pyproject.toml',
             'README.md',
             'PRD.md'
